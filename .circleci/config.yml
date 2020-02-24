@@ -1,0 +1,34 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/climbing-app
+
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:erbium
+
+    steps:
+      - checkout
+
+      # Restore from cache
+      - restore_cache:
+          keys:
+            - dependencies-cache-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - dependencies-cache
+
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: npm install
+
+      # Run tests
+      - run: 
+          name: Run tests with code coverage
+          command: npm test --coverage
+
+      # Save cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies-cache-{{ checksum "package.json" }}
